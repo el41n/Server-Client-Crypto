@@ -1,5 +1,5 @@
+"""Client used for receiving public key and making encrypted file"""
 import logging
-import pickle
 import socket
 import uuid
 
@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class Client:
+    """Connects to server and gets public key. Encryptes user input, writes to file and sends it to server"""
     def __init__(self):
         self.IP = '127.0.0.1'
         self.PORT = 8005
@@ -25,6 +26,7 @@ class Client:
         self.u_input = ''
 
     def start(self):
+        """Starts client for user inputting, receiving key, sending file name to server"""
         self.user_input()
         try:
             self.sock.connect((self.IP, self.PORT))
@@ -42,12 +44,14 @@ class Client:
             self.sock.close()
 
     def get_public_key(self):
+        """Gets public key from server"""
         logging.debug('Getting public key')
         self.sock.send(self.KEY_MESSAGE)
         self.public_key = self.sock.recv(self.BUFFER_SIZE)
         self.public_key = RSA.importKey(self.public_key, passphrase=None)
 
     def send_file_name(self):
+        """Sends encrypted file name to server"""
         logging.debug('Sending file name')
         self.sock.send(self.FILE_TRANSFER_MESSAGE)
         accept = self.sock.recv(self.BUFFER_SIZE)
@@ -55,6 +59,7 @@ class Client:
             self.sock.send(self.file_name)
 
     def user_input(self):
+        """Receives text from user. Waits for double enter for ending"""
         logging.debug('Wait for user input')
         print("Please enter text. Double enter for exit.")
         while True:
